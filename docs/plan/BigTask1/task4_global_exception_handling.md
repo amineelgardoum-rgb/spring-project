@@ -14,3 +14,6 @@ Inside `pack.core.web` (or a sub-package `pack.core.web.exceptions`):
 - For example, catch `EntityNotFoundException` and return an `ErrorResponse` with HTTP 404 (Not Found).
 - Catch `MethodArgumentNotValidException` to return HTTP 400 (Bad Request) with specific field validation errors.
 - Ensure all unhandled exceptions return a clean generic JSON error with HTTP 500.
+- Annotate DTOs with `@NotBlank`, `@NotNull`, etc. and use `@Valid` in controller parameters; `GlobalExceptionHandler` will catch `MethodArgumentNotValidException` and return field-level errors.
+
+See `architecture.md` in this folder for architectural decisions.
