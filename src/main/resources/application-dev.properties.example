@@ -1,7 +1,7 @@
 # Development profile — copy to application-dev.properties and fill your credentials
 spring.datasource.url=jdbc:mariadb://127.0.0.1:3306/annotationbase
-spring.datasource.username=YOUR_USER
-spring.datasource.password=YOUR_PASSWORD
+spring.datasource.username=
+spring.datasource.password=
 
 # Debug logging
 logging.level.com.ensah.nlp_annotation_platform=DEBUG
