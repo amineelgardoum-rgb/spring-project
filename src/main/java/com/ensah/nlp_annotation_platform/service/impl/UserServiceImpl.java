@@ -1,6 +1,6 @@
 package com.ensah.nlp_annotation_platform.service.impl;
 
-import com.ensah.nlp_annotation_platform.dto.UserDto;
+import com.ensah.nlp_annotation_platform.dto.response.UserResponse;
 import com.ensah.nlp_annotation_platform.mapper.UserMapper;
 import com.ensah.nlp_annotation_platform.repository.UserRepository;
 import com.ensah.nlp_annotation_platform.service.UserService;
@@ -18,9 +18,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto findByUsername(String username) {
+    public UserResponse findByUsername(String username) {
         return userRepository.findByUsername(username)
-                .map(userMapper::toDto)
+                .map(userMapper::toResponse)
                 .orElse(null);
     }
 }

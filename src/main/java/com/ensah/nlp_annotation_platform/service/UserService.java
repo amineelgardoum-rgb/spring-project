@@ -1,7 +1,7 @@
 package com.ensah.nlp_annotation_platform.service;
 
-import com.ensah.nlp_annotation_platform.dto.UserDto;
+import com.ensah.nlp_annotation_platform.dto.response.UserResponse;
 
 public interface UserService {
-    UserDto findByUsername(String username);
+    UserResponse findByUsername(String username);
 }
