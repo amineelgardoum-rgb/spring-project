@@ -1,6 +1,7 @@
 package com.ensah.nlp_annotation_platform.controller;
 
-import com.ensah.nlp_annotation_platform.dto.UserDto;
+import com.ensah.nlp_annotation_platform.dto.request.LoginRequest;
+import com.ensah.nlp_annotation_platform.dto.response.UserResponse;
 import com.ensah.nlp_annotation_platform.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,9 +22,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> payload) {
-        String username = payload.get("username");
-        UserDto user = userService.findByUsername(username);
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        UserResponse user = userService.findByUsername(request.getUsername());
         if (user == null) {
             return ResponseEntity.status(401).body(Map.of("error", "invalid_credentials"));
         }
