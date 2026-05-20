@@ -17,3 +17,9 @@ Secure the REST application using Spring Security and JSON Web Tokens (JWT). Sin
   - `/api/admin/**` -> Require authority `ADMIN_ROLE`.
   - `/api/annotator/**` -> Require authority `ANNOTATOR_ROLE`.
 - Add `AuthTokenFilter` before the `UsernamePasswordAuthenticationFilter` in the security filter chain.
+- Enable method-level security: add `@EnableMethodSecurity` in `SecurityConfig` and use `@PreAuthorize("hasRole('ADMIN')")` on admin controller methods.
+
+- **`AuthController.java`** also includes `POST /api/auth/refresh`: accepts a refresh token, validates it against the DB, returns a new JWT and a new refresh token (rotation).
+- Add `RefreshTokenRepository` and JPA entity `RefreshToken` (`id`, `token`, `user_id`, `expiry`).
+
+See `architecture.md` in this folder for architectural decisions.
