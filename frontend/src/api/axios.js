@@ -30,11 +30,8 @@ api.interceptors.response.use(
       }
 
       if (isRefreshing) {
-        return new Promise((resolve) => {
-          pendingRequests.push((newToken) => {
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-            resolve(api(originalRequest));
-          });
+        return new Promise((resolve, reject) => {
+          pendingRequests.push({ resolve, reject, originalRequest });
         });
       }
 
