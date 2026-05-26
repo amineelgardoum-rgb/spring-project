@@ -60,11 +60,12 @@ api.interceptors.response.use(
 
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);
-      } catch {
+      } catch (refreshError) {
+        pendingRequests.forEach(({ reject }) => reject(refreshError));
         localStorage.clear();
         pendingRequests = [];
         window.location.href = '/login';
-        return Promise.reject(error);
+        return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
       }
