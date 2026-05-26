@@ -49,7 +49,11 @@ VITE_API_BASE_URL=https://api.example.com
 Create `src/api/axios.js`:
 - Base URL from `import.meta.env.VITE_API_BASE_URL`
 - Request interceptor: read JWT from `localStorage`, attach `Authorization: Bearer <token>`
-- Response interceptor: on 401 status, clear localStorage token, redirect to `/login`
+- Response interceptor:
+  - On 401: try `POST /api/auth/refresh` once with the stored refresh token
+  - If refresh success → update `localStorage` with new token pair, retry the original request
+  - If refresh fail → clear `localStorage`, redirect to `/login`
+  - Use a mutex/flag so concurrent 401s only trigger one refresh batch
 
 ### 6. API modules
 Create typed API wrappers:
@@ -97,10 +101,18 @@ frontend/
 │           └── AnnotatorStats.jsx
 ```
 
+### 8. Global error handling from backend
+All pages should use `error.response?.data?.error` from the `GlobalExceptionHandler` for user-facing error messages instead of hardcoded strings:
+- `Login.jsx`: Parse `err.response.data.error` (e.g. `"invalid_credentials"`) to show the real backend message
+- Future admin/annotator pages: pass server error messages to Tailwind alert components
+
+---
+
 ## How to verify
-1. `npm run dev` starts without errors
-2. Tailwind CSS classes render correctly in browser
-3. Axios interceptor attaches JWT token to requests
-4. `.env.development` and `.env.production` are loaded correctly
+- [ ] 1. `npm run dev` starts without errors
+- [ ] 2. Tailwind CSS classes render correctly in browser
+- [ ] 3. Axios interceptor attaches JWT token to requests
+- [ ] 4. `.env.development` and `.env.production` are loaded correctly
+- [ ] 5. Backend GlobalExceptionHandler error messages appear in frontend alerts (not hardcoded)
 
 See `architecture.md` in this folder for architectural decisions.

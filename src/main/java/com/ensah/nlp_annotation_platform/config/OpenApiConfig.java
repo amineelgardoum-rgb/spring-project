@@ -1,0 +1,26 @@
+package com.ensah.nlp_annotation_platform.config;
+
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class OpenApiConfig {
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+            // 1. Ajouter l'icône de sécurité globale sur les endpoints
+            .addSecurityItem(new SecurityRequirement().addList("BearerAuth"))
+            // 2. Configurer le type de sécurité (JWT / Bearer Token)
+            .components(new Components()
+                .addSecuritySchemes("BearerAuth", new SecurityScheme()
+                    .name("BearerAuth")
+                    .type(SecurityScheme.Type.HTTP)
+                    .scheme("bearer")
+                    .bearerFormat("JWT")));
+    }
+}

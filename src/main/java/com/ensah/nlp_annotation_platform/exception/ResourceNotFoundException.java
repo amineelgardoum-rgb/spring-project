@@ -1,0 +1,7 @@
+package com.ensah.nlp_annotation_platform.exception;
+
+public class ResourceNotFoundException extends RuntimeException {
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
+}
