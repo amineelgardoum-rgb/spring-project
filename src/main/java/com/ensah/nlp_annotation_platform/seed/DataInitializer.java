@@ -26,6 +26,9 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        if (adminPassword == null || adminPassword.isBlank()) {
+            return;
+        }
         if (userRepository.findByUsername(adminUsername).isEmpty()) {
             User admin = new User();
             admin.setFirstName("Admin");
