@@ -33,7 +33,7 @@ Deliver React admin and annotator UIs with role-based routing, protected routes,
    - Token exists? No → redirect `/login`
    - Role matches required role? No → redirect to their own dashboard (admin → `/admin/dashboard`, annotator → `/annotator/tasks`)
 4. **Axios request interceptor** reads token from `localStorage` and attaches `Authorization: Bearer <token>` header to every request
-5. **Axios response interceptor** on 401: clear `localStorage`, redirect to `/login`
+5. **Axios response interceptor** on 401: see `docs/plan/BigTask1/task2_react_setup.md` step 5 — refresh retry + fallback to login
 6. **Logout:** Clear `localStorage`, update `AuthContext`, redirect to `/login`
 
 ---

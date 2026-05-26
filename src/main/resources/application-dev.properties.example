@@ -8,4 +8,12 @@ logging.level.com.ensah.nlp_annotation_platform=DEBUG
 logging.level.org.springframework.security=DEBUG
 logging.level.org.hibernate.SQL=DEBUG
 
+# Admin seed credentials
+app.admin.username=admin
+app.admin.password=CHANGE_ME
+
+# JWT — generate with: echo -n "your-secret-key-min-32-chars-long" | base64
+app.jwt.secret=CHANGE_ME
+app.jwt.expiration-ms=30000
+
 

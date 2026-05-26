@@ -4,7 +4,7 @@
 Since we are building a REST API, it is crucial to handle exceptions globally and return standardized JSON error responses instead of default HTML error pages or stack traces.
 
 ## What we should implement
-Inside `pack.core.web` (or a sub-package `pack.core.web.exceptions`):
+Inside `pack.exception` (or a sub-package `pack.exception`):
 - **`GlobalExceptionHandler.java`**: A class annotated with `@RestControllerAdvice`.
 - **`ErrorResponse.java`**: A DTO to structure the error messages (e.g., `timestamp`, `status`, `error`, `message`, `path`).
 - Custom Exception classes (e.g., `ResourceNotFoundException`, `UnauthorizedException`, `SpammerDetectedException`).

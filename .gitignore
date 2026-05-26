@@ -37,6 +37,13 @@ application-dev.properties
 *.log
 .env
 
+### PID files ###
+backend.pid
+
+### Frontend local env ###
+frontend/.env.local
+frontend/.env.*.local
+
 ### Frontend ###
 frontend/node_modules/
 frontend/dist/
