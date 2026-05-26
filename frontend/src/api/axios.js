@@ -51,7 +51,11 @@ api.interceptors.response.use(
         localStorage.setItem('username', username);
         localStorage.setItem('role', role);
 
-        pendingRequests.forEach((cb) => cb(newToken));
+        pendingRequests.forEach(({ resolve, originalRequest: req }) => {
+          req.headers = req.headers || {};
+          req.headers.Authorization = `Bearer ${newToken}`;
+          resolve(api(req));
+        });
         pendingRequests = [];
 
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
