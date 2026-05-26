@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import api from '../api/axios';
 
-export function useApi(endpoint, options = {}) {
+export function useApi(endpoint) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
