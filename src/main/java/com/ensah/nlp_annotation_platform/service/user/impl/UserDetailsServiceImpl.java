@@ -1,4 +1,4 @@
-package com.ensah.nlp_annotation_platform.service.user;
+package com.ensah.nlp_annotation_platform.service.user.impl;
 
 import com.ensah.nlp_annotation_platform.domain.User;
 import com.ensah.nlp_annotation_platform.repository.UserRepository;
