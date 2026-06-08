@@ -79,10 +79,9 @@ public class AuthController {
         refreshTokenRepository.delete(oldRt);
 
         String role = user.getRoles() == null ? "" :
-                java.util.Arrays.stream(user.getRoles().split(","))
-                        .map(String::trim)
-                        .filter(r -> !r.isEmpty())
+                user.getRoles().stream()
                         .findFirst()
+                        .map(Enum::name)
                         .orElse("");
         String newToken = jwtUtils.generateToken(user.getUsername(), role);
         String newRefreshToken = createRefreshToken(user);
