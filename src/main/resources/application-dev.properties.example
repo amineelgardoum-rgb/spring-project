@@ -1,20 +1,10 @@
-# Development profile — copy to application-dev.properties and fill your credentials
-spring.datasource.url=jdbc:mariadb://127.0.0.1:3306/annotationbase
-spring.datasource.username=
+# Dev profile — only override what differs from application.properties defaults
 spring.datasource.password=
 
 # Debug logging
 logging.level.com.ensah.nlp_annotation_platform=DEBUG
 logging.level.org.springframework.security=DEBUG
 logging.level.org.hibernate.SQL=DEBUG
-
-# Admin seed credentials
-app.admin.username=admin
-app.admin.password=
-
-# JWT — generate with: echo -n "your-secret-key-min-32-chars-long" | base64
-app.jwt.secret=CHANGE_ME
-app.jwt.expiration-ms=30000
 
 
 
