@@ -1,4 +1,4 @@
-package com.ensah.nlp_annotation_platform.service.impl;
+package com.ensah.nlp_annotation_platform.service.user.impl;
 
 import com.ensah.nlp_annotation_platform.domain.User;
 import com.ensah.nlp_annotation_platform.repository.UserRepository;
@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,10 +25,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        List<SimpleGrantedAuthority> authorities = Arrays.stream(user.getRoles().split(","))
-                .map(String::trim)
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                .collect(Collectors.toList());
+        List<SimpleGrantedAuthority> authorities =
+                user.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+                        .collect(Collectors.toList());
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),

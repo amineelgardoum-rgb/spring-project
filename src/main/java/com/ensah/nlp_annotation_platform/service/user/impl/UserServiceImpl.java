@@ -1,9 +1,9 @@
-package com.ensah.nlp_annotation_platform.service.impl;
+package com.ensah.nlp_annotation_platform.service.user.impl;
 
 import com.ensah.nlp_annotation_platform.dto.response.UserResponse;
 import com.ensah.nlp_annotation_platform.mapper.UserMapper;
 import com.ensah.nlp_annotation_platform.repository.UserRepository;
-import com.ensah.nlp_annotation_platform.service.UserService;
+import com.ensah.nlp_annotation_platform.service.user.UserService;
 import org.springframework.stereotype.Service;
 
 @Service
