@@ -3,7 +3,6 @@ package com.ensah.nlp_annotation_platform.seed;
 import com.ensah.nlp_annotation_platform.domain.Role;
 import com.ensah.nlp_annotation_platform.domain.User;
 import com.ensah.nlp_annotation_platform.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;

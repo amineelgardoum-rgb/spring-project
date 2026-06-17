@@ -5,6 +5,7 @@ import com.ensah.nlp_annotation_platform.dto.request.admin.UpdateUserRequest;
 import com.ensah.nlp_annotation_platform.dto.response.admin.CreatedUserResponse;
 import com.ensah.nlp_annotation_platform.dto.response.admin.UserAdminResponse;
 import com.ensah.nlp_annotation_platform.service.admin.AdminUserService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +30,13 @@ public class AdminUserController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CreatedUserResponse> createUser(@RequestBody CreateUserRequest request) {
+    public ResponseEntity<CreatedUserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
         return ResponseEntity.ok(adminUserService.createUser(request));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserAdminResponse> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest request) {
+    public ResponseEntity<UserAdminResponse> updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest request) {
         return ResponseEntity.ok(adminUserService.updateUser(id, request));
     }
 

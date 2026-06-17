@@ -69,4 +69,7 @@ public class Annotation {
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
+
+    @Version
+    private Long version;
 }
