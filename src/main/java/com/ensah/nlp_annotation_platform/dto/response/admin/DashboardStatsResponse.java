@@ -17,6 +17,7 @@ public class DashboardStatsResponse {
     private long totalTexts;
     private long totalAnnotators;
     private long totalAnnotations;
+    private long totalAssignments;
     private double overallAnnotationPercent;
     private Map<String, Long> globalClassDistribution;
     private List<AnnotatorProgressEntry> annotatorProgress;

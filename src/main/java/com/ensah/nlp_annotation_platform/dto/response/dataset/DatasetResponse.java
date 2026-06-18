@@ -6,5 +6,6 @@ import lombok.Data;
 public class DatasetResponse {
     private Long id;
     private String name;
+    private long totalAnnotations;
     private double completionPercentage;
 }

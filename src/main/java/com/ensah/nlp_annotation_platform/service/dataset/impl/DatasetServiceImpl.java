@@ -15,12 +15,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 @Service
 @Transactional
@@ -157,6 +154,7 @@ public class DatasetServiceImpl implements DatasetService {
 
         long totalItems = textItemRepository.countByDatasetId(dataset.getId());
         long totalAnnotations = annotationRepository.findByTextItem_Dataset_Id(dataset.getId()).size();
+        dto.setTotalAnnotations(totalAnnotations);
         long uniqueAnnotated = annotationRepository.findByTextItem_Dataset_Id(dataset.getId()).stream()
                 .map(a -> a.getTextItem().getId())
                 .distinct()
@@ -212,6 +210,7 @@ public class DatasetServiceImpl implements DatasetService {
         return textItemRepository.saveAll(items);
     }
 
+    @SuppressWarnings("unchecked")
     private List<TextItem> parseJsonLines(String content, Dataset dataset) {
         List<TextItem> items = new ArrayList<>();
         String[] lines = content.split("\\r?\\n");

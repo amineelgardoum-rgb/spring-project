@@ -7,8 +7,6 @@ import com.ensah.nlp_annotation_platform.dto.response.metrics.MetricsResponse;
 import com.ensah.nlp_annotation_platform.exception.ResourceNotFoundException;
 import com.ensah.nlp_annotation_platform.repository.*;
 import com.ensah.nlp_annotation_platform.service.metrics.MetricsService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,8 +19,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class MetricsServiceImpl implements MetricsService {
-
-    private static final Logger log = LoggerFactory.getLogger(MetricsServiceImpl.class);
 
     private final DatasetRepository datasetRepository;
     private final TextItemRepository textItemRepository;
@@ -107,7 +103,7 @@ public class MetricsServiceImpl implements MetricsService {
         for (Annotation ann : allAnnotations) {
             itemLabelCounts.computeIfAbsent(ann.getTextItem().getId(), k -> new HashMap<>());
             Map<String, Long> counts = itemLabelCounts.get(ann.getTextItem().getId());
-            counts.merge(ann.getLabel(), 1L, Long::sum);
+            counts.merge(ann.getLabel(), 1L, (a, b) -> a + b);
         }
 
         int k = labels.size();

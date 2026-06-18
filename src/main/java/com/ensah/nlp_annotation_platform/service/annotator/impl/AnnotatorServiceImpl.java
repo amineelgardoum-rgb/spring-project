@@ -7,8 +7,6 @@ import com.ensah.nlp_annotation_platform.dto.response.annotator.TextPairResponse
 import com.ensah.nlp_annotation_platform.exception.ResourceNotFoundException;
 import com.ensah.nlp_annotation_platform.repository.*;
 import com.ensah.nlp_annotation_platform.service.annotator.AnnotatorService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -21,8 +19,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class AnnotatorServiceImpl implements AnnotatorService {
-
-    private static final Logger log = LoggerFactory.getLogger(AnnotatorServiceImpl.class);
 
     private final UserRepository userRepository;
     private final AssignmentRepository assignmentRepository;

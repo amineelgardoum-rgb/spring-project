@@ -1,7 +1,6 @@
 package com.ensah.nlp_annotation_platform.service.admin.impl;
 
 import com.ensah.nlp_annotation_platform.domain.Annotation;
-import com.ensah.nlp_annotation_platform.domain.Role;
 import com.ensah.nlp_annotation_platform.domain.User;
 import com.ensah.nlp_annotation_platform.dto.response.admin.AnnotatorProgressEntry;
 import com.ensah.nlp_annotation_platform.dto.response.admin.DashboardStatsResponse;
@@ -39,9 +38,14 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
     public DashboardStatsResponse getStats() {
         long totalDatasets = datasetRepository.count();
         long totalTexts = textItemRepository.count();
-        long totalAnnotators = userRepository.findAll().stream()
-                .filter(u -> !u.getDeleted() && u.getRoles().contains(Role.ROLE_ANNOTATOR))
-                .count();
+        long totalAssignments = assignmentRepository.count();
+
+        List<Long> assignedAnnotatorIds = assignmentRepository.findAll().stream()
+                .map(a -> a.getAnnotator().getId())
+                .distinct()
+                .toList();
+        long totalAnnotators = assignedAnnotatorIds.size();
+
         List<Annotation> allAnnotations = annotationRepository.findAll();
         long totalAnnotations = allAnnotations.size();
 
@@ -53,8 +57,8 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         Map<String, Long> globalClassDistribution = allAnnotations.stream()
                 .collect(Collectors.groupingBy(Annotation::getLabel, Collectors.counting()));
 
-        List<User> annotators = userRepository.findAll().stream()
-                .filter(u -> !u.getDeleted() && u.getRoles().contains(Role.ROLE_ANNOTATOR))
+        List<User> annotators = userRepository.findAllById(assignedAnnotatorIds).stream()
+                .filter(u -> !u.getDeleted())
                 .toList();
 
         List<AnnotatorProgressEntry> annotatorProgress = new ArrayList<>();
@@ -89,6 +93,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                 .totalTexts(totalTexts)
                 .totalAnnotators(totalAnnotators)
                 .totalAnnotations(totalAnnotations)
+                .totalAssignments(totalAssignments)
                 .overallAnnotationPercent(overallAnnotationPercent)
                 .globalClassDistribution(globalClassDistribution)
                 .annotatorProgress(annotatorProgress)
