@@ -80,19 +80,21 @@ Deliver React admin and annotator UIs with role-based routing, protected routes,
 ### Page Components (Admin)
 | Component | API Calls | Description |
 |-----------|-----------|-------------|
-| `AdminDashboard.jsx` | `GET /api/admin/dashboard/stats` | Summary cards, global class distribution, annotator progress table, spammer alerts |
-| `DatasetsList.jsx` | `GET /api/admin/datasets?page=0&size=20` | Table with progress bars, click row → detail |
-| `DatasetDetail.jsx` | `GET /api/admin/datasets/{id}`, `DELETE /.../annotators/{userId}`, `GET /api/admin/annotations?textPairId=X`, `PUT /api/admin/annotations/{id}` | Detail view: text pairs, assigned annotators, annotation correction |
-| `DatasetUpload.jsx` | `POST /api/admin/datasets/upload` | File input + tags field + submit |
-| `AnnotatorManagement.jsx` | `GET/POST/PUT/DELETE /api/admin/users` | Table + Add/Edit/Delete modals |
-| `NlpDashboard.jsx` | `POST /api/admin/nlp/train\|test`, `GET /api/admin/nlp/logs` | Hyperparams form, Train/Test buttons, confusion matrix grid, logs table |
+| `AdminDashboard.jsx` | `GET /api/admin/dashboard/stats` | Summary cards (totalDatasets, totalTexts, totalAnnotators, totalAnnotations, totalAssignments, overallAnnotationPercent), global class distribution, annotator progress table, spammer alerts |
+| `DatasetsList.jsx` | `GET /api/admin/datasets` | Table with columns: Name, totalAnnotations, completionPercentage. Click row → detail |
+| `DatasetDetail.jsx` | `GET /api/admin/datasets/{id}`, `DELETE /api/admin/datasets/{id}/annotators/{userId}`, `GET /api/admin/annotations?textItemId=X`, `PUT /api/admin/annotations/{id}` | Detail view: text pairs paginated (100/page), assigned annotators list, annotation correction |
+| `DatasetUpload.jsx` | `POST /api/admin/datasets/upload` | Multipart form: file (CSV/JSON) + name + classes (semicolon-separated) + description |
+| `AnnotatorManagement.jsx` | `GET /api/admin/users`, `POST /api/admin/users`, `PUT /api/admin/users/{id}`, `DELETE /api/admin/users/{id}` | Table + Add modal (no password — auto-generated) + Edit + Soft Delete |
+| `NlpDashboard.jsx` | `POST /api/admin/nlp/train`, `POST /api/admin/nlp/test`, `GET /api/admin/nlp/logs` | Hyperparams form, Train/Test buttons, confusion matrix grid, history table with performance chart |
+| — | `GET /api/admin/datasets/{id}/metrics` | Fleiss' Kappa, per-annotator counts (used in NlpDashboard or dashboard) |
+| — | `GET /api/admin/datasets/{id}/export?format=csv\|json` | Export annotated dataset (used as download link from detail page) |
 
 ### Page Components (Annotator)
 | Component | API Calls | Description |
 |-----------|-----------|-------------|
-| `AnnotatorDashboard.jsx` | `GET /api/annotator/tasks` | Table of assigned tasks with progress % + "Travailler" link |
-| `AnnotationWorkspace.jsx` | `GET /api/annotator/tasks/:id/pairs?page=n`, `POST /api/annotator/tasks/:id/annotate` | Displays text(s), radio buttons for classes, Prev/Next/Save |
-| `AnnotatorStats.jsx` | `GET /api/annotator/stats` | Cards: total annotated, avg time. Class distribution chart/badges |
+| `AnnotatorDashboard.jsx` | `GET /api/annotator/tasks` | Table of assigned tasks with progress %, deadline, size. "Travailler" link |
+| `AnnotationWorkspace.jsx` | `GET /api/annotator/tasks/{taskId}/pairs?page=n`, `POST /api/annotator/tasks/{taskId}/annotate` | Displays Text1 + Text2, radio buttons for classes. Navigation: Précédent / Valider (save + next) / Suivant (skip) |
+| `AnnotatorStats.jsx` | `GET /api/annotator/stats` | Cards: totalAnnotated, avgTimePerAnnotation. Class distribution badges |
 
 ---
 

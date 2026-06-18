@@ -36,52 +36,58 @@ All admin pages are rendered inside `<AdminLayout>` which provides:
 - Quick links to Datasets, NLP Dashboard
 
 ### DatasetsList.jsx
-- Calls `GET /api/admin/datasets?page=0&size=20` on mount
-- Displays a table with columns: Name, Description, #Records, Progress (progress bar), Created Date
+- Calls `GET /api/admin/datasets` on mount
+- Displays a table with columns: Nom, % Avancement, Actions
+- Actions per row: `Détails` → navigates to `/admin/datasets/{id}`, `Ajouter Annotateurs` → opens assign modal
 - Pagination controls at bottom
 - Clicking a row navigates to `/admin/datasets/{id}` for detail view
 
 ### DatasetDetail.jsx
 - Calls `GET /api/admin/datasets/{id}` on mount
+- **Header info**: Taille (numRecords), Nom dataset, % avancement, Description, Classes (labels)
 - Four sections:
-  - **Dataset info card**: name, description, creation date, tags
   - **Assignment section**: "Assigner des annotateurs" button opens a modal with a multi-select list of available annotators → calls `POST /api/admin/datasets/{id}/assign` with selected `annotatorIds`. System automatically distributes pairs with redundancy of 3
-  - **Text pairs table**: paginated list of `(Text1, Text2)` pairs. Click a pair → loads its annotations below
-  - **Annotators card**: list of assigned annotators with their progress (annotated/total count). Each has a "Désaffecter" button → calls `DELETE /api/admin/datasets/{id}/annotators/{userId}` with confirmation dialog
-- When a text pair is selected, fetch `GET /api/admin/annotations?textPairId=X` and display each annotation (annotator name, class chosen, date). Admin can change the class via a dropdown + "Corriger" button → calls `PUT /api/admin/annotations/{id}`
+  - **Text pairs table**: paginated list of `(Text1, Text2)` pairs (100 per page). Click a pair → loads its annotations below
+  - **Annotators card**: list of assigned annotators with their progress (annotated/total count). Each has a "Supprimer" button → calls `DELETE /api/admin/datasets/{id}/annotators/{userId}` with confirmation dialog
+- When a text pair is selected, fetch `GET /api/admin/annotations?textItemId=X` and display each annotation (annotator name, class chosen, date). Admin can change the class via a dropdown + "Corriger" button → calls `PUT /api/admin/annotations/{id}`
+- Export link: `GET /api/admin/datasets/{id}/export?format=csv|json`
 
 ### DatasetUpload.jsx
-- Form with:
-  - File input (accepts `.csv`, `.json`)
-  - Text input for dataset name
-  - Text input for tags/classes (separated by `;`)
-  - Optional description textarea
-- Calls `POST /api/admin/datasets/upload` with `multipart/form-data`
+- Form with (matching forms.md UC2):
+  - **Fichier**: File input (accepts `.csv`, `.json`) with upload button
+  - **Nom**: Text input for dataset name
+  - **Classes**: Text input for classes separated by semicolons (e.g. `N;E;C` or `Similar;Not Similar`)
+  - **Description**: Textarea for dataset description
+- Buttons: `Annuler` (Cancel) → navigate back, `Créer` (Create) → submit
+- Calls `POST /api/admin/datasets/upload` with `multipart/form-data` (params: `file`, `tags`)
 - Shows upload progress and success/error toast
 
 ### AnnotatorManagement.jsx
 - Calls `GET /api/admin/users` on mount
-- Displays table: Nom, Prénom, Login, Created Date, Actions (Edit/Delete)
-- "Add Annotator" button opens a modal/form
-  - Calls `POST /api/admin/users` with firstName, lastName, username
-  - Backend auto-generates password; display it to admin once
-- Edit button opens a pre-filled modal (firstName, lastName, username) → calls `PUT /api/admin/users/{id}`
-- Delete calls `DELETE /api/admin/users/{id}` with confirmation dialog
+- Header action: `+ Ajouter` button → opens add modal (UC4-4)
+- Displays table columns (matching forms.md UC4): Nom, Prénom, Actions
+- **Add modal (UC4-4)**:
+  - Fields: `Nom` (lastName), `Prénom` (firstName), `Login` (username)
+  - ⚠️ No password field — backend auto-generates password; display it to admin once in a success alert
+  - Button: `Valider` → calls `POST /api/admin/users`
+- **Edit action**: button `Modifier` opens pre-filled modal (firstName, lastName, username) → calls `PUT /api/admin/users/{id}`
+- **Delete action**: button `Supprimer` → confirmation dialog → calls `DELETE /api/admin/users/{id}` (soft delete — backend sets `deleted = true`)
 - Uses Tailwind modal component for add/edit
 
 ### NlpDashboard.jsx
 - **Train section**:
   - Collapsible "Hyperparamètres" form with inputs: Learning Rate, Epochs, Batch Size
-  - "Train Model" button → calls `POST /api/admin/nlp/train` with hyperparameters body
-  - Shows loading spinner, then displays job status
+  - "Train Model" button → calls `POST /api/admin/nlp/train` with hyperparameters body `{ learningRate, epochs, batchSize }`
+  - Shows loading spinner, then displays job status (Job entity with status field)
 - **Test section**:
   - "Test Model" button → calls `POST /api/admin/nlp/test`
   - Displays results card: accuracy, F1-score
   - Renders confusion matrix as a styled Tailwind grid/table (e.g., a 2×2 or N×N matrix with color-coded cells)
-- History section: fetches `GET /api/admin/nlp/logs`
+- **History section**: fetches `GET /api/admin/nlp/logs`
   - Table: Date, Status, Accuracy, F1-Score, Hyperparameters, Actions (view logs)
   - **Performance chart**: include a simple line chart (using a lightweight chart library like Chart.js or Recharts) showing accuracy/F1-score over time across multiple training runs
   - Uses Tailwind table styling
+- **Metrics section**: "Voir métriques dataset" button → `GET /api/admin/datasets/{id}/metrics` (Fleiss' Kappa, class distribution per dataset)
 
 ## Data Fetching Pattern
 ```jsx
