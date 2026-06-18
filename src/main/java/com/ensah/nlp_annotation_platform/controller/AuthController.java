@@ -81,7 +81,7 @@ public class AuthController {
         String role = user.getRoles() == null ? "" :
                 user.getRoles().stream()
                         .findFirst()
-                        .map(Enum::name)
+                        .map(r -> r.name().replace("ROLE_", ""))
                         .orElse("");
         String newToken = jwtUtils.generateToken(user.getUsername(), role);
         String newRefreshToken = createRefreshToken(user);

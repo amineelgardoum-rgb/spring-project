@@ -24,41 +24,49 @@ All annotator pages are rendered inside `<AnnotatorLayout>` which provides:
 
 ### AnnotatorDashboard.jsx
 - Calls `GET /api/annotator/tasks` on mount
-- Displays a table with columns:
-  - Dataset Name
-  - Progress (e.g., "45/100" + progress bar)
-  - Deadline (if applicable)
-  - Action: "Travailler" button → navigates to `/annotator/tasks/{id}`
+- Displays a table with columns (matching forms.md UC6):
+  - Id
+  - Nom dataset
+  - Date limite (deadline)
+  - % Avancement (personal progress bar, e.g. "45/100")
+  - Taille (total assigned pairs)
+  - Actions: `Travailler` button → navigates to `/annotator/tasks/{id}`
 - At bottom of page: "Mes Statistiques" button/link → navigates to `/annotator/stats`
 - Empty state: "Aucune tâche assignée" message
 - Loading state: skeleton rows using Tailwind `animate-pulse`
 
 ### AnnotationWorkspace.jsx
+- URL param: `taskId` from route, `page` from query string (default 0)
 - Fetches current pair: `GET /api/annotator/tasks/{taskId}/pairs?page={currentPage}`
 - Displays:
-  - Progress indicator: "Question 5 / 100"
-  - Text content (Text1, and Text2 if pair-based task)
-  - Radio button group for available classes/tags (fetched from API response)
-- Navigation:
-  - "Précédent" (Previous) and "Suivant" (Next) buttons at bottom
-  - Current page index tracked in React state (`useState`)
-  - Disable Previous on first page, Next on last page
+  - **Header info**: "Id couple: X" and a description link/tooltip
+  - **Progress indicator**: "Question 5 / 100"
+  - **Texte 1**: Read-only text card/box (always present)
+  - **Texte 2**: Read-only text card/box (only if pair-based task, i.e. `pairContent` not null)
+  - **Radio button group** for available classes/tags (fetched from API response) — rendered dynamically based on response labels
+- Navigation (matching forms.md UC7):
+  - `<< Précédent` (Previous) — goes to previous page, disabled on first page
+  - `Valider` — **saves the current annotation and loads the next pair**. Calls `POST /api/annotator/tasks/{taskId}/annotate` with `{ textItemId, label }`. On success → auto-advance to next page + show success toast
+  - `Suivant >>` — skips to next pair **without saving**. Clears any selected class
+  - Disable Suivant/Valider on last page
 - Save behavior:
-  - "Sauvegarder" button calls `POST /api/annotator/tasks/{taskId}/annotate` with `{ textPairId, classId }`
-  - Auto-save option: save on every "Next" click
+  - `Valider` button calls `POST /api/annotator/tasks/{taskId}/annotate` with `{ textItemId: currentPair.id, label: selectedClass }`
   - Show success toast on save, error alert on failure
+  - If no class selected when Valider is clicked, show validation message "Veuillez sélectionner une classe"
 - Edge cases:
   - If task is completed (all pairs annotated), show a completion message with "Retour aux tâches" link
   - If API returns an error, show error alert with retry option
+  - If annotator already annotated this pair (re-opening workspace), pre-select the saved class
 
 ## State Management (per component)
 ```jsx
 // AnnotationWorkspace state shape
-const [currentPage, setCurrentPage] = useState(0);
+const [currentPage, setCurrentPage] = useState(0);    // synced with URL ?page=
 const [selectedClass, setSelectedClass] = useState(null);
-const [pairs, setPairs] = useState([]);       // cached pairs for this session
+const [currentPair, setCurrentPair] = useState(null);  // current TextPairResponse
 const [totalPages, setTotalPages] = useState(0);
-const { loading, error } = useApi(...);
+const [saving, setSaving] = useState(false);
+const { loading, error, execute: fetchPair } = useApi(...);
 ```
 
 ## Styling
@@ -81,6 +89,14 @@ const fetchPair = async (page) => {
 ### AnnotatorStats.jsx
 - Route: `/annotator/stats`
 - Calls `GET /api/annotator/stats` on mount
+- Expected response shape:
+```json
+{
+  "totalAnnotated": 45,
+  "avgTimePerAnnotation": 12.5,
+  "classDistribution": { "positif": 20, "negatif": 15, "neutre": 10 }
+}
+```
 - Displays:
   - **Stat cards** (Tailwind grid of cards):
     - Total annotated texts (large number)

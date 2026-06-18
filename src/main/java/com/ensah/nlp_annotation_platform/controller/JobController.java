@@ -1,6 +1,6 @@
 package com.ensah.nlp_annotation_platform.controller;
 
-import com.ensah.nlp_annotation_platform.dto.response.JobResponse;
+
 import com.ensah.nlp_annotation_platform.service.job.JobService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/jobs")

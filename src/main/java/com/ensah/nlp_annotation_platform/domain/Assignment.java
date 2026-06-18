@@ -1,6 +1,5 @@
 package com.ensah.nlp_annotation_platform.domain;
 
-import io.swagger.v3.oas.annotations.callbacks.Callback;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
