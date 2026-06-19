@@ -1,8 +1,10 @@
 package com.ensah.nlp_annotation_platform.service.nlp;
 
 import com.ensah.nlp_annotation_platform.domain.NlpTrainingLog;
+import com.ensah.nlp_annotation_platform.domain.TrainingMetric;
 import com.ensah.nlp_annotation_platform.domain.User;
 import com.ensah.nlp_annotation_platform.repository.NlpTrainingLogRepository;
+import com.ensah.nlp_annotation_platform.repository.TrainingMetricRepository;
 import com.ensah.nlp_annotation_platform.repository.UserRepository;
 import com.ensah.nlp_annotation_platform.service.job.JobService;
 import tools.jackson.databind.ObjectMapper;
@@ -28,6 +30,7 @@ public class NlpAsyncExecutor {
 
     private final JobService jobService;
     private final NlpTrainingLogRepository trainingLogRepository;
+    private final TrainingMetricRepository trainingMetricRepository;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
     private final Semaphore nlpSemaphore;
@@ -40,11 +43,13 @@ public class NlpAsyncExecutor {
 
     public NlpAsyncExecutor(JobService jobService,
                             NlpTrainingLogRepository trainingLogRepository,
+                            TrainingMetricRepository trainingMetricRepository,
                             UserRepository userRepository,
                             ObjectMapper objectMapper,
                             @Value("${nlp.max-concurrent-jobs:2}") int maxConcurrentJobs) {
         this.jobService = jobService;
         this.trainingLogRepository = trainingLogRepository;
+        this.trainingMetricRepository = trainingMetricRepository;
         this.userRepository = userRepository;
         this.objectMapper = objectMapper;
         this.nlpSemaphore = new Semaphore(maxConcurrentJobs);
@@ -59,7 +64,7 @@ public class NlpAsyncExecutor {
             String scriptPath = scriptsDir + File.separator + "train.py";
             String hyperJson = objectMapper.writeValueAsString(hyperparameters);
 
-            ProcessBuilder pb = new ProcessBuilder(pythonExecutable, scriptPath, hyperJson);
+            ProcessBuilder pb = new ProcessBuilder(pythonExecutable, scriptPath, String.valueOf(jobId), hyperJson);
             pb.redirectErrorStream(true);
             Process process = pb.start();
 
@@ -69,6 +74,22 @@ public class NlpAsyncExecutor {
                 while ((line = reader.readLine()) != null) {
                     output.append(line).append(System.lineSeparator());
                     log.debug("[train.py] {}", line);
+                    try {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> metric = objectMapper.readValue(line, Map.class);
+                        if (metric.containsKey("epoch")) {
+                            TrainingMetric tm = TrainingMetric.builder()
+                                    .jobId(jobId)
+                                    .epoch(asInt(metric.get("epoch")))
+                                    .loss(asDouble(metric.get("loss")))
+                                    .accuracy(asDouble(metric.get("accuracy")))
+                                    .evalLoss(asDouble(metric.get("eval_loss")))
+                                    .evalAccuracy(asDouble(metric.get("eval_accuracy")))
+                                    .build();
+                            trainingMetricRepository.save(tm);
+                        }
+                    } catch (Exception ignored) {
+                    }
                 }
             }
 
@@ -90,6 +111,16 @@ public class NlpAsyncExecutor {
         } finally {
             nlpSemaphore.release();
         }
+    }
+
+    private Integer asInt(Object val) {
+        if (val instanceof Number n) return n.intValue();
+        return null;
+    }
+
+    private Double asDouble(Object val) {
+        if (val instanceof Number n) return n.doubleValue();
+        return null;
     }
 
     @Async("taskExecutor")

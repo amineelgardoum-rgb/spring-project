@@ -1,6 +1,7 @@
 package com.ensah.nlp_annotation_platform.service.dataset.impl;
 
 import com.ensah.nlp_annotation_platform.domain.*;
+import com.ensah.nlp_annotation_platform.dto.response.dataset.DatasetDetailResponse;
 import com.ensah.nlp_annotation_platform.dto.response.dataset.DatasetResponse;
 import com.ensah.nlp_annotation_platform.exception.ResourceNotFoundException;
 import com.ensah.nlp_annotation_platform.repository.AnnotationRepository;
@@ -47,20 +48,21 @@ public class DatasetServiceImpl implements DatasetService {
     }
 
     @Override
-    public void uploadDataset(MultipartFile file, String tags) {
+    public void uploadDataset(MultipartFile file, String tags, String name, String description) {
         String filename = file.getOriginalFilename();
         if (filename == null) {
             throw new IllegalArgumentException("File name is required");
         }
 
         List<String> labels = parseTags(tags);
-        String name = filename.contains(".") ? filename.substring(0, filename.lastIndexOf('.')) : filename;
+        String datasetName = (name != null && !name.isBlank()) ? name
+                : (filename.contains(".") ? filename.substring(0, filename.lastIndexOf('.')) : filename);
         User admin = userRepository.findByUsername(adminUsername)
                 .orElseThrow(() -> new ResourceNotFoundException("Admin user not found: " + adminUsername));
 
         Dataset dataset = new Dataset();
-        dataset.setName(name);
-        dataset.setDescription("Uploaded from " + filename);
+        dataset.setName(datasetName);
+        dataset.setDescription(description != null && !description.isBlank() ? description : "Uploaded from " + filename);
         dataset.setFilePath("");
         dataset.setCreatedBy(admin);
         dataset.setLabels(labels);
@@ -103,8 +105,34 @@ public class DatasetServiceImpl implements DatasetService {
     public Object getDatasetDetail(Long id) {
         Dataset dataset = datasetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Dataset not found"));
-        List<Long> assignedIds = assignmentRepository.findByDataset_Id(id).stream()
+
+        List<Assignment> assignments = assignmentRepository.findByDataset_Id(id);
+        List<Long> assignedIds = assignments.stream()
                 .map(a -> a.getAnnotator().getId())
+                .toList();
+
+        List<DatasetDetailResponse.AnnotatorInfo> annotatorInfos = assignments.stream()
+                .map(a -> DatasetDetailResponse.AnnotatorInfo.builder()
+                        .id(a.getAnnotator().getId())
+                        .username(a.getAnnotator().getUsername())
+                        .email(a.getAnnotator().getUsername()) // using username as email fallback
+                        .build())
+                .toList();
+
+        long totalItems = textItemRepository.countByDatasetId(id);
+        long annotatedItems = annotationRepository.findByTextItem_Dataset_Id(id).stream()
+                .map(a -> a.getTextItem().getId())
+                .distinct()
+                .count();
+        double pct = totalItems > 0 ? (double) annotatedItems / totalItems * 100.0 : 0.0;
+        double progress = Math.round(pct * 100.0) / 100.0;
+
+        List<DatasetDetailResponse.TextItemInfo> textItemInfos = textItemRepository.findByDatasetId(id).stream()
+                .map(item -> DatasetDetailResponse.TextItemInfo.builder()
+                        .id(item.getId())
+                        .sourceText(item.getContent())
+                        .targetText(item.getPairContent())
+                        .build())
                 .toList();
 
         return com.ensah.nlp_annotation_platform.dto.response.dataset.DatasetDetailResponse.builder()
@@ -116,6 +144,9 @@ public class DatasetServiceImpl implements DatasetService {
                 .createdBy(dataset.getCreatedBy().getUsername())
                 .labels(dataset.getLabels())
                 .assignedAnnotatorIds(assignedIds)
+                .progress(progress)
+                .annotators(annotatorInfos)
+                .textItems(textItemInfos)
                 .createdAt(dataset.getCreatedAt())
                 .updatedAt(dataset.getUpdatedAt())
                 .build();

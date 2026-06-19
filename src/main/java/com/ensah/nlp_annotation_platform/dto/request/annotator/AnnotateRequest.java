@@ -11,4 +11,6 @@ public class AnnotateRequest {
 
     @NotBlank(message = "label is required")
     private String label;
+
+    private Double duration;
 }

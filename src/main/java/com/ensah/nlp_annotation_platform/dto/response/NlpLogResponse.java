@@ -19,6 +19,10 @@ public class NlpLogResponse {
     private String triggeredByUsername;
     private String hyperparameters;
     private String metrics;
+    private Double accuracy;
+    private Double f1Score;
+    private Double loss;
+    private String modelPath;
     private String status;
     private String executionLogs;
 }

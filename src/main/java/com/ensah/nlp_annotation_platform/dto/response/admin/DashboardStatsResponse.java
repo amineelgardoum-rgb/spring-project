@@ -21,5 +21,5 @@ public class DashboardStatsResponse {
     private double overallAnnotationPercent;
     private Map<String, Long> globalClassDistribution;
     private List<AnnotatorProgressEntry> annotatorProgress;
-    private List<Long> spammerIds;
+    private List<SpammerInfo> spammers;
 }

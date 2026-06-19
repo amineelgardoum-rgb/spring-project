@@ -48,7 +48,7 @@ public class AnnotatorController {
             @PathVariable Long taskId,
             @Valid @RequestBody AnnotateRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
-        annotatorService.submitAnnotation(taskId, request.getTextItemId(), request.getLabel(), userDetails.getUsername());
+        annotatorService.submitAnnotation(request.getTextItemId(), request.getLabel(), request.getDuration(), userDetails.getUsername());
         return ResponseEntity.ok(Map.of("status", "ok"));
     }
 

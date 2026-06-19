@@ -15,18 +15,18 @@ All admin pages are rendered inside `<AdminLayout>` which provides:
 - Top header bar with user info and logout button
 
 ```
-/admin/dashboard        → AdminDashboard.jsx
-/admin/datasets         → DatasetsList.jsx
-/admin/datasets/:id     → DatasetDetail.jsx
-/admin/datasets/upload  → DatasetUpload.jsx
+/admin                  → AdminDashboard.jsx   (index route)
 /admin/annotators       → AnnotatorManagement.jsx
+/admin/datasets         → DatasetsList.jsx
+/admin/datasets/new     → DatasetUpload.jsx
+/admin/datasets/:id     → DatasetDetail.jsx
 /admin/nlp              → NlpDashboard.jsx
 ```
 
 ## Components
 
 ### AdminDashboard.jsx
-- Route: `/admin/dashboard` (default redirect after login)
+- Route: `/admin` (index route, default after login)
 - Calls `GET /api/admin/dashboard/stats` on mount
 - Displays summary cards:
   - Total datasets, total texts, total annotators, overall annotation %

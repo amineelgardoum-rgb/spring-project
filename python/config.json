@@ -1,0 +1,11 @@
+{
+  "model_name": "aubmindlab/bert-base-arabertv02",
+  "num_labels": 3,
+  "batch_size": 16,
+  "learning_rate": 2e-5,
+  "weight_decay": 0.01,
+  "num_epochs": 4,
+  "max_length": 128,
+  "output_dir": "./results/model_output",
+  "logging_dir": "./results/logs"
+}

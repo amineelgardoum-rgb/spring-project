@@ -5,7 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface DatasetService {
-    void uploadDataset(MultipartFile file, String tags);
+    void uploadDataset(MultipartFile file, String tags, String name, String description);
     List<DatasetResponse> listDatasets();
     Object getDatasetDetail(Long id);
     void assignAnnotators(Long id, List<Long> annotatorIds);
