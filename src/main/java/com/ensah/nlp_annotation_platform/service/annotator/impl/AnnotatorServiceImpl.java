@@ -22,18 +22,15 @@ public class AnnotatorServiceImpl implements AnnotatorService {
 
     private final UserRepository userRepository;
     private final AssignmentRepository assignmentRepository;
-    private final DatasetRepository datasetRepository;
     private final TextItemRepository textItemRepository;
     private final AnnotationRepository annotationRepository;
 
     public AnnotatorServiceImpl(UserRepository userRepository,
                                 AssignmentRepository assignmentRepository,
-                                DatasetRepository datasetRepository,
                                 TextItemRepository textItemRepository,
                                 AnnotationRepository annotationRepository) {
         this.userRepository = userRepository;
         this.assignmentRepository = assignmentRepository;
-        this.datasetRepository = datasetRepository;
         this.textItemRepository = textItemRepository;
         this.annotationRepository = annotationRepository;
     }

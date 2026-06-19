@@ -1,7 +1,5 @@
 package com.ensah.nlp_annotation_platform.service.nlp;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -13,7 +11,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Service
 public class MetricsSseService {
 
-    private static final Logger log = LoggerFactory.getLogger(MetricsSseService.class);
     private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
 
     public SseEmitter createEmitter() {
