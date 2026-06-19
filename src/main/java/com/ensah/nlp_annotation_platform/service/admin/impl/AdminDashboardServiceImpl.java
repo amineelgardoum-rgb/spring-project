@@ -4,6 +4,7 @@ import com.ensah.nlp_annotation_platform.domain.Annotation;
 import com.ensah.nlp_annotation_platform.domain.User;
 import com.ensah.nlp_annotation_platform.dto.response.admin.AnnotatorProgressEntry;
 import com.ensah.nlp_annotation_platform.dto.response.admin.DashboardStatsResponse;
+import com.ensah.nlp_annotation_platform.dto.response.admin.SpammerInfo;
 import com.ensah.nlp_annotation_platform.repository.*;
 import com.ensah.nlp_annotation_platform.service.admin.AdminDashboardService;
 import org.springframework.stereotype.Service;
@@ -62,7 +63,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                 .toList();
 
         List<AnnotatorProgressEntry> annotatorProgress = new ArrayList<>();
-        List<Long> spammerIds = new ArrayList<>();
+        List<SpammerInfo> spammers = new ArrayList<>();
 
         for (User annotator : annotators) {
             List<Annotation> userAnnotations = annotationRepository.findByAnnotator_Id(annotator.getId());
@@ -84,7 +85,11 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                     .build());
 
             if (isSpammer(classDist, count)) {
-                spammerIds.add(annotator.getId());
+                spammers.add(SpammerInfo.builder()
+                        .id(annotator.getId())
+                        .firstName(annotator.getFirstName())
+                        .lastName(annotator.getLastName())
+                        .build());
             }
         }
 
@@ -97,7 +102,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                 .overallAnnotationPercent(overallAnnotationPercent)
                 .globalClassDistribution(globalClassDistribution)
                 .annotatorProgress(annotatorProgress)
-                .spammerIds(spammerIds)
+                .spammers(spammers)
                 .build();
     }
 

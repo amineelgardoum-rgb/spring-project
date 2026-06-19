@@ -21,6 +21,29 @@ public class DatasetDetailResponse {
     private String createdBy;
     private List<String> labels;
     private List<Long> assignedAnnotatorIds;
+    private Double progress;
+    private List<AnnotatorInfo> annotators;
+    private List<TextItemInfo> textItems;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AnnotatorInfo {
+        private Long id;
+        private String username;
+        private String email;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TextItemInfo {
+        private Long id;
+        private String sourceText;
+        private String targetText;
+    }
 }

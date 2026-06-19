@@ -22,8 +22,12 @@ public class DatasetController {
 
     @PostMapping("/upload")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> uploadDataset(@RequestParam("file") MultipartFile file, @RequestParam("tags") String tags) {
-        datasetService.uploadDataset(file, tags);
+    public ResponseEntity<Void> uploadDataset(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("tags") String tags,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "description", required = false) String description) {
+        datasetService.uploadDataset(file, tags, name, description);
         return ResponseEntity.accepted().build();
     }
 

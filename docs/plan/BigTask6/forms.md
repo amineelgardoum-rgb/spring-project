@@ -13,7 +13,7 @@ The landing page after admin login, showing global platform statistics.
 * **Summary cards:** Total datasets, total texts, total annotators, total annotations, total assignments, overall annotation %
 * **Global class distribution:** Badges or horizontal bar chart showing count per label across all datasets
 * **Annotator progress table:** List of annotators with annotated count, avg time, class distribution
-* **Spammer alerts:** Red banner listing annotator names flagged as spammers (95%+ single label)
+* **Spammer alerts:** Red banner listing annotator names (from `spammers[].firstName + lastName`) flagged as spammers (95%+ single label)
 * **Quick links:** Navigate to Datasets, NLP Dashboard
 
 ### UC2: Create a Dataset (`Création d'un dataset`)
@@ -79,7 +79,7 @@ A dashboard for quality assurance (integrated into NlpDashboard).
 * **Data Table columns:** `Id`, `Nom dataset`, `Actions`.
 * **Actions per row:**
   * `Afficher métrique` (UC5-1): Calls `GET /api/admin/datasets/{id}/metrics` → displays Fleiss' Kappa, per-annotator counts, class distribution
-  * `Spammeurs` (UC5-2): Uses `GET /api/admin/dashboard/stats` `spammerIds` list → highlights flagged annotators
+      * `Spammeurs` (UC5-2): Uses `GET /api/admin/dashboard/stats` `spammers` list (with `firstName`, `lastName`) → highlights flagged annotators
 * **NLP Training:** `POST /api/admin/nlp/train` with hyperparams `{ learningRate, epochs, batchSize }` → returns job ID. Poll `GET /api/jobs/{id}` for status updates (PENDING → RUNNING → COMPLETED/FAILED)
 * **NLP Testing:** `POST /api/admin/nlp/test` → returns job ID. Poll `GET /api/jobs/{id}` for completion
 * **NLP History:** `GET /api/admin/nlp/logs` — table of past runs with accuracy, F1-score, confusion matrix

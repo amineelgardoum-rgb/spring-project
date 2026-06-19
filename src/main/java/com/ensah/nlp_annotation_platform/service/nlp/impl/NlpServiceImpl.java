@@ -9,6 +9,7 @@ import com.ensah.nlp_annotation_platform.repository.UserRepository;
 import com.ensah.nlp_annotation_platform.service.job.JobService;
 import com.ensah.nlp_annotation_platform.service.nlp.NlpAsyncExecutor;
 import com.ensah.nlp_annotation_platform.service.nlp.NlpService;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ import java.util.Map;
 @Transactional
 public class NlpServiceImpl implements NlpService {
 
-    private static final Logger log = LoggerFactory.getLogger(NlpServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(NlpServiceImpl.class);
 
     private final NlpTrainingLogRepository trainingLogRepository;
     private final UserRepository userRepository;
@@ -74,12 +75,28 @@ public class NlpServiceImpl implements NlpService {
         try {
             return objectMapper.writeValueAsString(obj);
         } catch (Exception e) {
-            log.error("Failed to serialize to JSON", e);
+            logger.error("Failed to serialize to JSON", e);
             return null;
         }
     }
 
     private NlpLogResponse toLogResponse(NlpTrainingLog log) {
+        Double accuracy = null;
+        Double f1Score = null;
+        Double loss = null;
+        String modelPath = null;
+        if (log.getMetrics() != null) {
+            try {
+                JsonNode root = objectMapper.readTree(log.getMetrics());
+                if (root.has("accuracy")) accuracy = root.get("accuracy").asDouble();
+                if (root.has("f1Score")) f1Score = root.get("f1Score").asDouble();
+                if (root.has("f1")) f1Score = root.get("f1").asDouble();
+                if (root.has("loss")) loss = root.get("loss").asDouble();
+                if (root.has("modelPath")) modelPath = root.get("modelPath").asText();
+            } catch (Exception e) {
+                logger.warn("Failed to parse metrics JSON for log {}", log.getId(), e);
+            }
+        }
         return NlpLogResponse.builder()
                 .id(log.getId())
                 .startedAt(log.getStartedAt())
@@ -88,6 +105,10 @@ public class NlpServiceImpl implements NlpService {
                 .triggeredByUsername(log.getTriggeredBy().getUsername())
                 .hyperparameters(log.getHyperparameters())
                 .metrics(log.getMetrics())
+                .accuracy(accuracy)
+                .f1Score(f1Score)
+                .loss(loss)
+                .modelPath(modelPath)
                 .status(log.getStatus().name())
                 .executionLogs(log.getExecutionLogs())
                 .build();

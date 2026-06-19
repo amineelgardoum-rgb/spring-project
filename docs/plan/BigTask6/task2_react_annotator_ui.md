@@ -15,7 +15,7 @@ All annotator pages are rendered inside `<AnnotatorLayout>` which provides:
 - Clean, focused UI for annotation work
 
 ```
-/annotator/tasks         → AnnotatorDashboard.jsx
+/annotator               → AnnotatorDashboard.jsx   (index route)
 /annotator/tasks/:taskId → AnnotationWorkspace.jsx
 /annotator/stats         → AnnotatorStats.jsx
 ```

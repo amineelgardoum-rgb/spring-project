@@ -4,7 +4,7 @@ import com.ensah.nlp_annotation_platform.service.metrics.MetricsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+
 
 @RestController
 @RequestMapping("/api/admin")
@@ -24,7 +24,7 @@ public class MetricsExportController {
 
     @GetMapping("/datasets/{id}/export")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<StreamingResponseBody> exportDataset(@PathVariable Long id, @RequestParam(defaultValue = "csv") String format) {
+    public ResponseEntity<byte[]> exportDataset(@PathVariable Long id, @RequestParam(defaultValue = "csv") String format) {
         return metricsService.exportDataset(id, format);
     }
 }

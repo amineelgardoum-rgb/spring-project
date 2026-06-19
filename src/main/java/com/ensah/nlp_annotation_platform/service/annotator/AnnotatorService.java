@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface AnnotatorService {
     Page<AnnotatorTaskResponse> getTasks(String username, Pageable pageable);
-    Page<TextPairResponse> getTextPairs(Long datasetId, String username, Pageable pageable);
-    void submitAnnotation(Long datasetId, Long textItemId, String label, String username);
+    Page<TextPairResponse> getTextPairs(Long assignmentId, String username, Pageable pageable);
+    void submitAnnotation(Long textItemId, String label, Double duration, String username);
     AnnotatorStatsResponse getStats(String username);
 }

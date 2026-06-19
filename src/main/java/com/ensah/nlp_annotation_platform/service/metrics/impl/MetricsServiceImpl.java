@@ -8,10 +8,10 @@ import com.ensah.nlp_annotation_platform.exception.ResourceNotFoundException;
 import com.ensah.nlp_annotation_platform.repository.*;
 import com.ensah.nlp_annotation_platform.service.metrics.MetricsService;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -66,7 +66,7 @@ public class MetricsServiceImpl implements MetricsService {
     }
 
     @Override
-    public ResponseEntity<StreamingResponseBody> exportDataset(Long datasetId, String format) {
+    public ResponseEntity<byte[]> exportDataset(Long datasetId, String format) {
         Dataset dataset = datasetRepository.findById(datasetId)
                 .orElseThrow(() -> new ResourceNotFoundException("Dataset not found"));
 
@@ -76,21 +76,19 @@ public class MetricsServiceImpl implements MetricsService {
         Map<Long, List<Annotation>> annotationMap = annotations.stream()
                 .collect(Collectors.groupingBy(a -> a.getTextItem().getId()));
 
-        StreamingResponseBody stream = out -> {
-            if ("json".equalsIgnoreCase(format)) {
-                exportAsJson(out, textItems, annotationMap);
-            } else {
-                exportAsCsv(out, textItems, annotationMap, dataset.getLabels());
-            }
-        };
+        byte[] data;
+        if ("json".equalsIgnoreCase(format)) {
+            data = exportAsJson(textItems, annotationMap);
+        } else {
+            data = exportAsCsv(textItems, annotationMap, dataset.getLabels());
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=dataset_" + datasetId + "." + format);
-        headers.add(HttpHeaders.CONTENT_TYPE,
-                "json".equalsIgnoreCase(format) ? "application/json" : "text/csv");
+        headers.setContentType("json".equalsIgnoreCase(format) ? MediaType.APPLICATION_JSON : MediaType.TEXT_PLAIN);
 
-        return ResponseEntity.ok().headers(headers).body(stream);
+        return ResponseEntity.ok().headers(headers).body(data);
     }
 
     private Double computeFleissKappa(Long datasetId, List<String> labels) {
@@ -154,9 +152,8 @@ public class MetricsServiceImpl implements MetricsService {
         return (Pbar - PbarE) / (1 - PbarE);
     }
 
-    private void exportAsJson(java.io.OutputStream out,
-                               List<TextItem> items,
-                               Map<Long, List<Annotation>> annotationMap) throws java.io.IOException {
+    private byte[] exportAsJson(List<TextItem> items,
+                                Map<Long, List<Annotation>> annotationMap) {
         List<Map<String, Object>> export = new ArrayList<>();
         for (TextItem item : items) {
             Map<String, Object> entry = new LinkedHashMap<>();
@@ -173,14 +170,17 @@ public class MetricsServiceImpl implements MetricsService {
                     .toList());
             export.add(entry);
         }
-        new tools.jackson.databind.ObjectMapper().writerWithDefaultPrettyPrinter()
-                .writeValue(out, export);
+        try {
+            return new tools.jackson.databind.ObjectMapper().writerWithDefaultPrettyPrinter()
+                    .writeValueAsBytes(export);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize export JSON", e);
+        }
     }
 
-    private void exportAsCsv(java.io.OutputStream out,
-                              List<TextItem> items,
-                              Map<Long, List<Annotation>> annotationMap,
-                              List<String> labels) throws java.io.IOException {
+    private byte[] exportAsCsv(List<TextItem> items,
+                               Map<Long, List<Annotation>> annotationMap,
+                               List<String> labels) {
         StringBuilder sb = new StringBuilder();
         sb.append("textItemId,content,pairContent");
         for (String label : labels) {
@@ -206,7 +206,7 @@ public class MetricsServiceImpl implements MetricsService {
             sb.append(",").append(escapeCsv(annotators)).append("\n");
         }
 
-        out.write(sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        return sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
     }
 
     private String escapeCsv(String value) {

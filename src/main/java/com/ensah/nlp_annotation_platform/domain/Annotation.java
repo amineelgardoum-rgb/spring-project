@@ -66,6 +66,9 @@ public class Annotation {
     @Column(columnDefinition = "TEXT")
     private String comment;
 
+    @Column(nullable = true)
+    private Double duration;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

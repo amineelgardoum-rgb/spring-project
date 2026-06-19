@@ -48,6 +48,8 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('username');
     localStorage.removeItem('role');
+    localStorage.removeItem('darkMode');
+    document.documentElement.classList.remove('dark');
     setToken(null);
     setRefreshTokenValue(null);
     setUser(null);

@@ -10,15 +10,15 @@ Deliver React admin and annotator UIs with role-based routing, protected routes,
 ```
 /login                       → Login.jsx               (public)
 /admin                       → AdminLayout              (requires ADMIN_ROLE)
-  /admin/dashboard           → AdminDashboard.jsx
-  /admin/datasets            → DatasetsList.jsx
-  /admin/datasets/:id        → DatasetDetail.jsx
-  /admin/datasets/upload     → DatasetUpload.jsx
+  /admin                     → AdminDashboard.jsx       (index route)
   /admin/annotators          → AnnotatorManagement.jsx
+  /admin/datasets            → DatasetsList.jsx
+  /admin/datasets/new        → DatasetUpload.jsx
+  /admin/datasets/:id        → DatasetDetail.jsx
   /admin/nlp                 → NlpDashboard.jsx
 /annotator                   → AnnotatorLayout          (requires ANNOTATOR_ROLE)
-  /annotator/tasks           → AnnotatorDashboard.jsx
-  /annotator/tasks/:id       → AnnotationWorkspace.jsx
+  /annotator                 → AnnotatorDashboard.jsx   (index route)
+  /annotator/tasks/:taskId   → AnnotationWorkspace.jsx
   /annotator/stats           → AnnotatorStats.jsx
 *                            → NotFound.jsx             (404)
 ```
@@ -31,7 +31,7 @@ Deliver React admin and annotator UIs with role-based routing, protected routes,
 2. **Store:** Save token + role to `localStorage` and React `AuthContext`
 3. **ProtectedRoute component** checks:
    - Token exists? No → redirect `/login`
-   - Role matches required role? No → redirect to their own dashboard (admin → `/admin/dashboard`, annotator → `/annotator/tasks`)
+    - Role matches required role? No → redirect to their own dashboard (admin → `/admin`, annotator → `/annotator`)
 4. **Axios request interceptor** reads token from `localStorage` and attaches `Authorization: Bearer <token>` header to every request
 5. **Axios response interceptor** on 401: see `docs/plan/BigTask1/task2_react_setup.md` step 5 — refresh retry + fallback to login
 6. **Logout:** Clear `localStorage`, update `AuthContext`, redirect to `/login`
@@ -47,20 +47,18 @@ Deliver React admin and annotator UIs with role-based routing, protected routes,
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<ProtectedRoute role="ADMIN"><AdminLayout /></ProtectedRoute>}>
-          <Route index element={<Navigate to="dashboard" />} />
-           <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="datasets" element={<DatasetsList />} />
-          <Route path="datasets/:id" element={<DatasetDetail />} />
-          <Route path="datasets/upload" element={<DatasetUpload />} />
-          <Route path="annotators" element={<AnnotatorManagement />} />
-          <Route path="nlp" element={<NlpDashboard />} />
-        </Route>
-        <Route path="/annotator" element={<ProtectedRoute role="ANNOTATOR"><AnnotatorLayout /></ProtectedRoute>}>
-          <Route index element={<Navigate to="tasks" />} />
-          <Route path="tasks" element={<AnnotatorDashboard />} />
-          <Route path="tasks/:taskId" element={<AnnotationWorkspace />} />
-          <Route path="stats" element={<AnnotatorStats />} />
-        </Route>
+           <Route index element={<AdminDashboard />} />
+           <Route path="annotators" element={<AnnotatorManagement />} />
+           <Route path="datasets" element={<DatasetsList />} />
+           <Route path="datasets/new" element={<DatasetUpload />} />
+           <Route path="datasets/:id" element={<DatasetDetail />} />
+           <Route path="nlp" element={<NlpDashboard />} />
+         </Route>
+         <Route path="/annotator" element={<ProtectedRoute role="ANNOTATOR"><AnnotatorLayout /></ProtectedRoute>}>
+           <Route index element={<AnnotatorDashboard />} />
+           <Route path="tasks/:taskId" element={<AnnotationWorkspace />} />
+           <Route path="stats" element={<AnnotatorStats />} />
+         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
@@ -74,7 +72,7 @@ Deliver React admin and annotator UIs with role-based routing, protected routes,
 
 ### Shared Components
 - **`ProtectedRoute.jsx`** — Reads `AuthContext`, checks token existence and role; redirects accordingly
-- **`AdminLayout.jsx`** — Sidebar navigation (Dashboard, Datasets, Upload, Annotators, NLP) + header (user info, logout)
+- **`AdminLayout.jsx`** — Sidebar navigation (Dashboard, Datasets, Annotateurs, NLP Training) + header (user info, logout)
 - **`AnnotatorLayout.jsx`** — Simple header with app name + logout button
 
 ### Page Components (Admin)
@@ -137,6 +135,6 @@ Two `.env` files:
 1. `npm run dev` starts without errors
 2. Login page renders and authentication works
 3. Protected routes redirect unauthenticated users to `/login`
-4. Admin sidebar navigation works for all 5 pages (Dashboard, Datasets, Upload, Annotators, NLP)
+4. Admin sidebar navigation works for all pages (Dashboard, Datasets, Annotateurs, NLP Training)
 5. Annotator can view tasks and navigate through the annotation workspace
 6. `npm run build` produces a production bundle without errors

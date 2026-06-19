@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AnnotatorTaskResponse {
+    private Long id;
     private Long datasetId;
     private String datasetName;
     private String datasetDescription;
