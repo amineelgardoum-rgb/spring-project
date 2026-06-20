@@ -21,38 +21,43 @@ Plateforme intelligente d'annotation collaborative et d'apprentissage supervisé
 - Node.js 20+
 - Python 3.x (only for NLP train/test)
 
-### Backend
+### Running the Application
+
+There are two ways to run the full-stack application (Backend + Frontend):
+
+#### 1. Development Mode (Recommended - No JAR required)
+You can compile and run the backend and frontend dynamically with a single command without packaging the JAR:
 
 ```bash
-mvn clean package -DskipTests
-java -jar target/app.jar
+chmod +x mvnw
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 ```
+* **Backend** starts on `http://localhost:8080` (uses the `dev` profile database).
+* **Frontend** starts automatically in the background on `http://localhost:5173` via Vite (no need to open a separate terminal to run `npm run dev`).
 
-Starts on `http://localhost:8080`.  
-Database `annotationbase` created automatically. Tables created fresh each start (DDL `create`).
+#### 2. Standalone Mode (Using the JAR)
+If you want to package the application to run as a single `.jar` file:
 
-Seeded users:
+1. **Build the project** (this will automatically copy the built `app.jar` to the project root):
+   ```bash
+   chmod +x mvnw
+   ./mvnw clean package -DskipTests
+   ```
+
+2. **Run the JAR** from the project root:
+   * **Linux/macOS:**
+     ```bash
+     SPRING_PROFILES_ACTIVE=dev java -jar app.jar
+     ```
+   * **Windows (CMD):**
+     ```bash
+     set SPRING_PROFILES_ACTIVE=dev
+     java -jar app.jar
+     ```
+
+### Seeded Users
 - **admin / admin** (ADMIN)
 - **user1 / user1**, **user2 / user2**, **user3 / user3** (ANNOTATOR)
-
-### Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Starts on `http://localhost:5173`. Vite proxies `/api` → `http://localhost:8080`.
-
-### Dev Profile
-
-Preserves data across restarts (DDL `update`):
-
-```bash
-set SPRING_PROFILES_ACTIVE=dev
-java -jar target/app.jar
-```
 
 ## API Endpoints
 
